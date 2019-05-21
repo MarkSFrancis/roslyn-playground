@@ -1,8 +1,8 @@
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
-using RoslynPlayground.Code;
-using RoslynPlayground.Code.Compiler;
+using RoslynPlayground.Compiler;
 using RoslynPlayground.Samples;
+using RoslynPlayground.Workspace;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace RoslynPlayground.Tests
         [Test]
         public async Task CompilingCode_ThatDoesCompile_CompilesLoadableCode()
         {
-            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.AutocompleteTest);
+            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.CompilerTest);
 
             var compiler = new PlaygroundCompiler(playground);
 
