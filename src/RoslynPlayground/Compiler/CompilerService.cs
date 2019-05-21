@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace RoslynPlayground.Compiler
 {
-    public class PlaygroundCompiler
+    public class CompilerService
     {
-        public PlaygroundCompiler(PlaygroundWorkspace workspace)
+        public CompilerService(PlaygroundWorkspace workspace)
         {
             Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         }

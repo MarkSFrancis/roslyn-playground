@@ -1,27 +1,38 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
 using RoslynPlayground.Workspace;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace RoslynPlayground.Analysis
 {
-    public class PlaygroundAutocomplete
+    public class AutocompleteService : IDisposable
     {
-        public PlaygroundAutocomplete(PlaygroundWorkspace workspace)
+        public AutocompleteService(PlaygroundWorkspace workspace)
         {
-            Workspace = workspace;
+            Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
 
+            Workspace.EditingDocumentChanged += WorkspaceEditingDocumentChanged;
+
+            WorkspaceEditingDocumentChanged(
+                null, 
+                new EditingDocumentChangedEventArgs(Workspace.EditingFile, Workspace.EditingDocument)
+            );
+        }
+
+        private void WorkspaceEditingDocumentChanged(object sender, EditingDocumentChangedEventArgs e)
+        {
             if (Workspace.EditingDocument != null)
             {
                 _completionService = CompletionService.GetService(Workspace.EditingDocument);
             }
         }
 
-        public PlaygroundWorkspace Workspace { get; }
+        private CompletionService _completionService;
 
-        private readonly CompletionService _completionService;
+        public PlaygroundWorkspace Workspace { get; }
 
         public async Task<IEnumerable<CompletionItem>> GetAutoComplete()
         {
@@ -45,6 +56,11 @@ namespace RoslynPlayground.Analysis
             var editingPrefix = originalSource.Substring(suggested.Span.Start, suggested.Span.Length);
 
             return suggested.Items.Where(c => c.DisplayText.StartsWith(editingPrefix));
+        }
+
+        public void Dispose()
+        {
+            Workspace.EditingDocumentChanged -= WorkspaceEditingDocumentChanged;
         }
     }
 }

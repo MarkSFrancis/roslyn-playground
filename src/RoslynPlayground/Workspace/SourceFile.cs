@@ -32,7 +32,7 @@ namespace RoslynPlayground.Workspace
             set
             {
                 _editorPosition = value;
-                EditorPositionChanged?.Invoke(this, new EditorPositionChangedEventArgs(Filename, _editorPosition));
+                EditorPositionChanged?.Invoke(this, new EditorPositionChangedEventArgs(this, _editorPosition));
             }
         }
 

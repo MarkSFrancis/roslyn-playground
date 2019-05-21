@@ -1,15 +1,17 @@
-﻿namespace RoslynPlayground.Workspace
+﻿using System;
+
+namespace RoslynPlayground.Workspace
 {
     public class EditorPositionChangedEventArgs
     {
-        public EditorPositionChangedEventArgs(string filename, int? newPosition)
+        public EditorPositionChangedEventArgs(SourceFile source, int? newPosition)
         {
-            Filename = filename;
+            Source = source ?? throw new ArgumentNullException(nameof(source));
             NewPosition = newPosition;
         }
 
         public int? NewPosition { get; set; }
 
-        public string Filename { get; set; }
+        public SourceFile Source { get; set; }
     }
 }

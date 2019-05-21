@@ -16,21 +16,25 @@ namespace RoslynPlayground
         {
             var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.AutocompleteTest, 174);
 
-            var autocompleteService = new PlaygroundAutocomplete(playground);
+            using (var autocompleteService = new AutocompleteService(playground))
+            {
+                await Autocomplete(autocompleteService);
 
-            await Autocomplete(autocompleteService);
-            playground.EditingFile.Code.ChangeCode(172, "To", true);
-            await Autocomplete(autocompleteService);
-            playground.EditingFile.Code.ChangeCode(172, "Ex", true);
-            await Autocomplete(autocompleteService);
-            playground.EditingFile.Code.ChangeCode(172, "T", true);
-            await Autocomplete(autocompleteService);
-            playground.EditingFile.EditorPosition--;
+                playground.EditingFile.Code.ChangeCode(172, "To", true);
+                await Autocomplete(autocompleteService);
+
+                playground.EditingFile.Code.ChangeCode(172, "Ex", true);
+                await Autocomplete(autocompleteService);
+
+                playground.EditingFile.Code.ChangeCode(172, "T", true);
+                playground.EditingFile.EditorPosition--;
+                await Autocomplete(autocompleteService);
+            }
 
             Console.ReadKey(true);
         }
 
-        private static async Task Autocomplete(PlaygroundAutocomplete autocompleteService)
+        private static async Task Autocomplete(AutocompleteService autocompleteService)
         {
             IEnumerable<CompletionItem> autocomplete = await autocompleteService.GetAutoComplete();
 
