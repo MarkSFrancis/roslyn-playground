@@ -72,8 +72,7 @@ namespace RoslynPlayground.Workspace
                 "sandbox",
                 LanguageNames.CSharp,
                 metadataReferences: ReferenceBuilder.GetReferences(),
-                compilationOptions: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
-                parseOptions: new CSharpParseOptions(LanguageVersion.Default, DocumentationMode.Parse, WorkspaceType)
+                compilationOptions: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
             newWorkspace.AddProject(projectInfo);

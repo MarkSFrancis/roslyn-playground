@@ -1,13 +1,17 @@
-﻿using Microsoft.CodeAnalysis.Completion;
-using RoslynPlayground.Workspace;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Completion;
+using RoslynPlayground.Compiler;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RoslynPlayground
 {
     public interface IAnalyser
     {
-        Task<CompletionItem> GetAutocompleteSuggestions(PlaygroundWorkspace workspace);
+        Task<IEnumerable<CompletionItem>> GetAutocompleteAsync();
 
+        Task<IReadOnlyCollection<Diagnostic>> GetDiagnosticsAsync();
 
+        Task<CompilerResult> CompileAsync();
     }
 }

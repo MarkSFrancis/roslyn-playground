@@ -12,7 +12,7 @@ namespace RoslynPlayground
     {
         public static string Sample(List<string> texts)
         {
-            texts.Ad;
+            System.Console.WriteLine(""Sample"");
             return string.Join("", "", texts);
         }
     }
@@ -31,6 +31,22 @@ namespace RoslynPlayground
         {
             texts.Add(""From Source"");
             return string.Join("", "", texts);
+        }
+    }
+}
+".ToUnix();
+
+        public static string WarningsTest =>
+@"
+using System.Threading.Tasks;
+
+namespace RoslynPlayground
+{
+    class Source
+    {
+        public static async Task<string> Sample()
+        {
+            return string.Empty;
         }
     }
 }

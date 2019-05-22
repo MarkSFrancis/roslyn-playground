@@ -1,7 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
 using RoslynPlayground.Analysis;
-using RoslynPlayground.Diagnostics;
+using RoslynPlayground.Code;
+using RoslynPlayground.ConsoleHelpers;
 using RoslynPlayground.Samples;
 using RoslynPlayground.Workspace;
 using System;
@@ -11,62 +12,91 @@ using System.Threading.Tasks;
 
 namespace RoslynPlayground
 {
+    using static Console;
+    using static ConsoleHelper;
+
     internal class Program
     {
         private static async Task Main()
         {
-            Console.WriteLine("Creating sandbox from source:");
-            Console.WriteLine();
-            Console.WriteLine(SampleCode.AutocompleteTest);
+            WriteLine("Creating sandbox from source:");
+            WriteLine();
+            WriteLine(SampleCode.WarningsTest);
+            WriteLine();
 
-            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.AutocompleteTest, 174);
+            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.WarningsTest, 170);
+            var analyser = new Analyser(playground);
 
-            var diagnostics = new DiagnosticService(playground);
-            var diagnosticsResult = await diagnostics.GetDiagnosticsAsync();
+            await Diagnostics(analyser);
 
-            var originalConsoleColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-            foreach(var diagnostic in diagnosticsResult)
+            WriteLine();
+
+            (var line, var column) = PositionConverter.PositionToRowColumn(playground.EditingFile.EditorPosition.Value, playground.EditingFile.RawContents);
+
+            WriteLine($"Intellisense at {playground.EditingFile.EditorPosition} (line {line}, column {column}): ");
+
+            using (UseColor(ConsoleColor.Cyan))
+            {
+                await Autocomplete(analyser);
+            }
+            WriteLine();
+
+            WriteLine($"Press {nameof(ConsoleKey.Enter)} to exit");
+            UntilEnterPressed();
+        }
+
+        private static async Task Diagnostics(Analyser analyser)
+        {
+            IReadOnlyCollection<Diagnostic> diagnosticsResult = await analyser.GetDiagnosticsAsync();
+
+            if (diagnosticsResult.Count == 0)
+            {
+                WriteLineInColor("No diagnostics", ConsoleColor.Green);
+                return;
+            }
+
+            WriteLineInColor("Diagnostics: ", ConsoleColor.White);
+
+            foreach (Diagnostic diagnostic in diagnosticsResult.OrderByDescending(d => d.Severity))
             {
                 var start = diagnostic.Location.SourceSpan.Start;
                 var length = diagnostic.Location.SourceSpan.Length;
 
-                Console.WriteLine($"From {start} to {start + length}: {diagnostic}");
+                ConsoleColor colorOfDiagnostic;
+                switch (diagnostic.Severity)
+                {
+                    case DiagnosticSeverity.Hidden:
+                        colorOfDiagnostic = ConsoleColor.White;
+                        break;
+                    case DiagnosticSeverity.Info:
+                        colorOfDiagnostic = ConsoleColor.Cyan;
+                        break;
+                    case DiagnosticSeverity.Warning:
+                        colorOfDiagnostic = ConsoleColor.Yellow;
+                        break;
+                    case DiagnosticSeverity.Error:
+                        colorOfDiagnostic = ConsoleColor.Red;
+                        break;
+                    default:
+                        colorOfDiagnostic = ConsoleColor.White;
+                        break;
+                }
+
+                WriteLineInColor($"From {start} to {start + length}: {diagnostic}", colorOfDiagnostic);
             }
-            Console.ForegroundColor = originalConsoleColor;
-
-            Console.WriteLine();
-            Console.WriteLine("Intellisense at " + playground.EditingFile.EditorPosition + ": ");
-
-            var autocompleteService = new AutocompleteService(playground);
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            await Autocomplete(autocompleteService);
-            Console.ForegroundColor = originalConsoleColor;
-
-            Console.WriteLine($"Press {nameof(ConsoleKey.Enter)} to exit");
-            UntilEnter();
         }
 
-        private static async Task Autocomplete(AutocompleteService autocompleteService)
+        private static async Task Autocomplete(Analyser analyser)
         {
-            IEnumerable<CompletionItem> autocomplete = await autocompleteService.GetAutoComplete();
+            IEnumerable<CompletionItem> autocomplete = await analyser.GetAutocompleteAsync();
 
             var forDisplay = string.Join(Environment.NewLine,
                 autocomplete.Select(c => string.Join(", ", c.Tags) + " " + c.DisplayText));
 
             if (forDisplay != string.Empty)
             {
-                Console.WriteLine(forDisplay);
+                WriteLine(forDisplay);
             }
-        }
-
-        private static void UntilEnter()
-        {
-            ConsoleKey key;
-            do
-            {
-                key = Console.ReadKey(true).Key;
-            } while (key != ConsoleKey.Enter);
         }
     }
 }

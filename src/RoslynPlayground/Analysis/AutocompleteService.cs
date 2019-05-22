@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Completion;
+﻿using Microsoft.CodeAnalysis.Completion;
 using RoslynPlayground.Workspace;
 using System;
 using System.Collections.Generic;

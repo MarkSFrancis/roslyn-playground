@@ -1,5 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
+using RoslynPlayground.Code;
 using System.Collections.Generic;
 using System.IO;
 
@@ -11,9 +11,14 @@ namespace RoslynPlayground.Workspace
 
         public static IEnumerable<MetadataReference> GetReferences(IEnumerable<string> extraReferences)
         {
-            yield return GetAssemblyPathByName("mscorlib.dll");
+            yield return GetAssemblyPathByName("System.Private.CoreLib");
 
-            foreach(var extraReference in extraReferences)
+            foreach (var reference in CodeImports.GetFrameworkReferences())
+            {
+                yield return GetAssemblyPathByName(reference);
+            }
+
+            foreach (var extraReference in extraReferences)
             {
                 yield return GetAssemblyPathByName(extraReference);
             }
@@ -30,14 +35,7 @@ namespace RoslynPlayground.Workspace
 
             if (!filename.EndsWith(dllExtension))
             {
-                if (filename.Contains("."))
-                {
-                    throw new ArgumentException("Non DLL reference detected: " + filename);
-                }
-                else
-                {
-                    filename += dllExtension;
-                }
+                filename += dllExtension;
             }
 
             return MetadataReference.CreateFromFile(Path.Combine(_coreLibrariesDirectory, filename));
