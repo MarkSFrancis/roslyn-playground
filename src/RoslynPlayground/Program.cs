@@ -8,6 +8,7 @@ using RoslynPlayground.Workspace;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace RoslynPlayground
@@ -21,10 +22,16 @@ namespace RoslynPlayground
         {
             WriteLine("Creating sandbox from source:");
             WriteLine();
-            WriteLine(SampleCode.WarningsTest);
+            WriteLine(SampleScript.HelloWorld);
             WriteLine();
 
-            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.WarningsTest, 170);
+            var playground = PlaygroundWorkspace.FromSource(
+                SourceCodeKind.Script,
+                SampleScript.HelloWorld,
+                8,
+                injectDefaultUsings: true
+            );
+
             var analyser = new Analyser(playground);
 
             await Diagnostics(analyser);
@@ -38,6 +45,14 @@ namespace RoslynPlayground
             using (UseColor(ConsoleColor.Cyan))
             {
                 await Autocomplete(analyser);
+            }
+            WriteLine();
+
+            WriteLine($"Compiling...");
+
+            using (UseColor(ConsoleColor.Cyan))
+            {
+                await CompileAndRun(analyser, null, null);
             }
             WriteLine();
 

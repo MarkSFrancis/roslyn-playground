@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using RoslynPlayground.Code;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,7 +87,8 @@ namespace RoslynPlayground.Workspace
                 var documentToLoad = DocumentInfo.Create(
                     DocumentId.CreateNewId(projectInfo.Id),
                     fileToLoad.Filename,
-                    loader: fileToLoad.GetSourceLoader()
+                    loader: fileToLoad.GetSourceLoader(),
+                    sourceCodeKind: WorkspaceType
                 );
 
                 var document = newWorkspace.AddDocument(documentToLoad);
@@ -106,8 +108,17 @@ namespace RoslynPlayground.Workspace
             SourceCodeKind workspaceType,
             string source,
             int? editorPosition = null,
-            string filename = "Program.cs")
+            string filename = "Program.cs",
+            bool injectDefaultUsings = false)
         {
+            if (injectDefaultUsings)
+            {
+                var usings = CodeImports.DefaultUsings()
+                    .Select(u => "using " + u + ";" + UnixStringExtensions.UnixNewLine);
+
+                source = string.Join(string.Empty, usings) + source;
+            }
+
             return new PlaygroundWorkspace(workspaceType, new SourceFile(filename, source, editorPosition));
         }
 

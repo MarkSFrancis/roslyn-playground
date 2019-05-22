@@ -4,16 +4,16 @@ namespace RoslynPlayground.Code
 {
     public class CodeImports
     {
-        //public static readonly IReadOnlyCollection<string> DefaultUsings = new[]
-        //{
-        //    "System",
-        //    "System.Linq",
-        //    "System.Collections.Generic",
-        //    "System.Globalization",
-        //    "System.IO",
-        //    "System.Text",
-        //    "System.Threading.Tasks"
-        //};
+        public static IEnumerable<string> DefaultUsings()
+        {
+            yield return "System";
+            yield return "System.Linq";
+            yield return "System.Collections.Generic";
+            yield return "System.Globalization";
+            yield return "System.IO";
+            yield return "System.Text";
+            yield return "System.Threading.Tasks";
+        }
 
         public static IEnumerable<string> GetFrameworkReferences()
         {
