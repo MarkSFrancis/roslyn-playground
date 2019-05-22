@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
 using RoslynPlayground.Analysis;
+using RoslynPlayground.Diagnostics;
 using RoslynPlayground.Samples;
 using RoslynPlayground.Workspace;
 using System;
@@ -14,24 +15,36 @@ namespace RoslynPlayground
     {
         private static async Task Main()
         {
+            Console.WriteLine("Creating sandbox from source:");
+            Console.WriteLine();
+            Console.WriteLine(SampleCode.AutocompleteTest);
+
             var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.AutocompleteTest, 174);
 
-            using (var autocompleteService = new AutocompleteService(playground))
+            var diagnostics = new DiagnosticService(playground);
+            var diagnosticsResult = await diagnostics.GetDiagnosticsAsync();
+
+            var originalConsoleColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            foreach(var diagnostic in diagnosticsResult)
             {
-                await Autocomplete(autocompleteService);
+                var start = diagnostic.Location.SourceSpan.Start;
+                var length = diagnostic.Location.SourceSpan.Length;
 
-                playground.EditingFile.Code.ChangeCode(172, "To", true);
-                await Autocomplete(autocompleteService);
-
-                playground.EditingFile.Code.ChangeCode(172, "Ex", true);
-                await Autocomplete(autocompleteService);
-
-                playground.EditingFile.Code.ChangeCode(172, "T", true);
-                playground.EditingFile.EditorPosition--;
-                await Autocomplete(autocompleteService);
+                Console.WriteLine($"From {start} to {start + length}: {diagnostic}");
             }
+            Console.ForegroundColor = originalConsoleColor;
 
-            Console.ReadKey(true);
+            Console.WriteLine();
+            Console.WriteLine("Intellisense at " + playground.EditingFile.EditorPosition + ": ");
+
+            var autocompleteService = new AutocompleteService(playground);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            await Autocomplete(autocompleteService);
+            Console.ForegroundColor = originalConsoleColor;
+
+            Console.WriteLine($"Press {nameof(ConsoleKey.Enter)} to exit");
+            UntilEnter();
         }
 
         private static async Task Autocomplete(AutocompleteService autocompleteService)
@@ -45,6 +58,15 @@ namespace RoslynPlayground
             {
                 Console.WriteLine(forDisplay);
             }
+        }
+
+        private static void UntilEnter()
+        {
+            ConsoleKey key;
+            do
+            {
+                key = Console.ReadKey(true).Key;
+            } while (key != ConsoleKey.Enter);
         }
     }
 }

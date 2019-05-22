@@ -48,6 +48,11 @@ namespace RoslynPlayground.Analysis
 
         private IEnumerable<CompletionItem> FilterByActiveSpan(CompletionList suggested, string originalSource)
         {
+            if (suggested is null)
+            {
+                return new List<CompletionItem>();
+            }
+
             if (originalSource is null || suggested.Span.IsEmpty)
             {
                 return suggested.Items;

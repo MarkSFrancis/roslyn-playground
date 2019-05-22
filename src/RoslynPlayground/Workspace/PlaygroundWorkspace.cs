@@ -65,15 +65,13 @@ namespace RoslynPlayground.Workspace
             var solution = SolutionInfo.Create(SolutionId.CreateNewId("sandbox"), VersionStamp.Default);
             newWorkspace.AddSolution(solution);
 
-            var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-
             var projectInfo = ProjectInfo.Create(
                 ProjectId.CreateNewId("sandbox"),
                 VersionStamp.Default,
                 "sandbox",
                 "sandbox",
                 LanguageNames.CSharp,
-                metadataReferences: new[] { mscorlib },
+                metadataReferences: ReferenceBuilder.GetReferences(),
                 compilationOptions: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
                 parseOptions: new CSharpParseOptions(LanguageVersion.Default, DocumentationMode.Parse, WorkspaceType)
             );
