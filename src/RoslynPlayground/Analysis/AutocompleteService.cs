@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace RoslynPlayground.Analysis
 {
-    public class AutocompleteService : IDisposable
+    public class AutoCompleteService : IDisposable
     {
-        public AutocompleteService(PlaygroundWorkspace workspace)
+        public AutoCompleteService(PlaygroundWorkspace workspace)
         {
             Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
 
@@ -33,7 +33,7 @@ namespace RoslynPlayground.Analysis
 
         public PlaygroundWorkspace Workspace { get; }
 
-        public async Task<IEnumerable<CompletionItem>> GetAutoComplete()
+        public async Task<IEnumerable<CompletionItem>> GetAutoCompleteAsync()
         {
             if (Workspace.EditingDocument is null)
             {
@@ -64,7 +64,10 @@ namespace RoslynPlayground.Analysis
 
         public void Dispose()
         {
-            Workspace.EditingDocumentChanged -= WorkspaceEditingDocumentChanged;
+            if (Workspace != null)
+            {
+                Workspace.EditingDocumentChanged -= WorkspaceEditingDocumentChanged;
+            }
         }
     }
 }

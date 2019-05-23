@@ -4,24 +4,24 @@ using System.Threading.Tasks;
 
 namespace RoslynPlayground.Compiler
 {
-    public class Runner
+    public static class Runner
     {
-        public static async Task CompileAndRun(Analyser analyser, string type, string methodName, object instance = null, params object[] parameters)
+        public static async Task CompileAndRun(this Analyser analyser, string type, string methodName, object instance = null, params object[] parameters)
         {
             await CompileAndRun<object>(analyser, type, methodName, BindingFlags.Default, instance, parameters);
         }
 
-        public static Task<T> CompileAndRun<T>(Analyser analyser, string type, string methodName, object instance = null, params object[] parameters)
+        public static Task<T> CompileAndRun<T>(this Analyser analyser, string type, string methodName, object instance = null, params object[] parameters)
         {
             return CompileAndRun<T>(analyser, type, methodName, BindingFlags.Default, instance, parameters);
         }
 
-        public static async Task CompileAndRun(Analyser analyser, string type, string methodName, BindingFlags methodFlags, object instance = null, params object[] parameters)
+        public static async Task CompileAndRun(this Analyser analyser, string type, string methodName, BindingFlags methodFlags, object instance = null, params object[] parameters)
         {
             await CompileAndRun<object>(analyser, type, methodName, methodFlags, instance, parameters);
         }
 
-        public static async Task<T> CompileAndRun<T>(Analyser analyser, string type, string methodName, BindingFlags methodFlags, object instance = null, params object[] parameters)
+        public static async Task<T> CompileAndRun<T>(this Analyser analyser, string type, string methodName, BindingFlags methodFlags, object instance = null, params object[] parameters)
         {
             CompilerResult compiled = await analyser.CompileAsync();
 
@@ -37,12 +37,12 @@ namespace RoslynPlayground.Compiler
             return (T)result;
         }
 
-        public static Task CompileAndRunScript(Analyser analyser)
+        public static Task CompileAndRunScript(this Analyser analyser)
         {
             return CompileAndRun(analyser, "Script", "<Main>", BindingFlags.NonPublic | BindingFlags.Static);
         }
 
-        public static Task<T> CompileAndRunScript<T>(Analyser analyser)
+        public static Task<T> CompileAndRunScript<T>(this Analyser analyser)
         {
             return CompileAndRun<T>(analyser, "Script", "<Main>", BindingFlags.NonPublic | BindingFlags.Static);
         }

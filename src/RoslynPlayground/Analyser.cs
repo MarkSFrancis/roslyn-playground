@@ -15,30 +15,31 @@ namespace RoslynPlayground
         {
             Workspace = workspace;
 
-            _compiler = new CompilerService(workspace);
-            _autocomplete = new AutocompleteService(workspace);
-            _diagnostics = new DiagnosticService(workspace);
+            _autoComplete = new AutoCompleteService(workspace);
         }
 
         public PlaygroundWorkspace Workspace { get; }
 
-        private readonly CompilerService _compiler;
-        private readonly AutocompleteService _autocomplete;
-        private readonly DiagnosticService _diagnostics;
+        private readonly AutoCompleteService _autoComplete;
 
         public Task<CompilerResult> CompileAsync()
         {
-            return _compiler.Compile();
+            return Workspace.CompileAsync();
         }
 
-        public Task<IEnumerable<CompletionItem>> GetAutocompleteAsync()
+        public Task<IEnumerable<CompletionItem>> GetAutoCompleteAsync()
         {
-            return _autocomplete.GetAutoComplete();
+            return _autoComplete.GetAutoCompleteAsync();
         }
 
         public Task<IReadOnlyCollection<Diagnostic>> GetDiagnosticsAsync()
         {
-            return _diagnostics.GetDiagnosticsAsync();
+            return Workspace.GetDiagnosticsAsync();
+        }
+
+        public void Dispose()
+        {
+            _autoComplete?.Dispose();
         }
     }
 }

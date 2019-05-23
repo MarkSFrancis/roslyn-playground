@@ -6,18 +6,11 @@ using System.Threading.Tasks;
 
 namespace RoslynPlayground.Diagnostics
 {
-    public class DiagnosticService
+    public static class DiagnosticService
     {
-        public DiagnosticService(PlaygroundWorkspace workspace)
+        public static async Task<IReadOnlyCollection<Diagnostic>> GetDiagnosticsAsync(this PlaygroundWorkspace workspace)
         {
-            Workspace = workspace;
-        }
-
-        public PlaygroundWorkspace Workspace { get; }
-
-        public async Task<IReadOnlyCollection<Diagnostic>> GetDiagnosticsAsync()
-        {
-            SemanticModel semantics = await Workspace.EditingDocument.GetSemanticModelAsync();
+            SemanticModel semantics = await workspace.EditingDocument.GetSemanticModelAsync();
 
             ImmutableArray<Diagnostic> diagnostics = semantics.GetDiagnostics();
 

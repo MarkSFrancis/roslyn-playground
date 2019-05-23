@@ -15,7 +15,7 @@ namespace RoslynPlayground.Tests
         [Test]
         public void Autocomplete_NullWorkspace_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new AutocompleteService(null));
+            Assert.Throws<ArgumentNullException>(() => new AutoCompleteService(null));
         }
 
         [Test]
@@ -24,7 +24,7 @@ namespace RoslynPlayground.Tests
             var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.CompilerTest, 174);
 
             IEnumerable<string> results;
-            using (var autoComplete = new AutocompleteService(playground))
+            using (var autoComplete = new AutoCompleteService(playground))
             {
                 results = await GetAutocomplete(autoComplete);
             }
@@ -38,9 +38,9 @@ namespace RoslynPlayground.Tests
             CollectionAssert.AreEqual(expected, results);
         }
 
-        private async Task<IEnumerable<string>> GetAutocomplete(AutocompleteService autocomplete)
+        private async Task<IEnumerable<string>> GetAutocomplete(AutoCompleteService autocomplete)
         {
-            var selection = await autocomplete.GetAutoComplete();
+            var selection = await autocomplete.GetAutoCompleteAsync();
 
             return selection.Select(r => r.DisplayText);
         }

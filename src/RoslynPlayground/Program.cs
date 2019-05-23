@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
-using RoslynPlayground.Analysis;
 using RoslynPlayground.Code;
 using RoslynPlayground.Compiler;
 using RoslynPlayground.ConsoleHelpers;
@@ -9,7 +8,6 @@ using RoslynPlayground.Workspace;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace RoslynPlayground
@@ -32,28 +30,30 @@ namespace RoslynPlayground
                 8
             );
 
-            var analyser = new Analyser(playground);
-
-            await Diagnostics(analyser);
-
-            WriteLine();
-
-            (var line, var column) = PositionConverter.PositionToRowColumn(playground.EditingFile.EditorPosition.Value, playground.EditingFile.RawContents);
-
-            WriteLine($"Intellisense at {playground.EditingFile.EditorPosition} (line {line}, column {column}): ");
-
-            using (UseColor(ConsoleColor.Cyan))
+            using (var analyser = new Analyser(playground))
             {
-                await Autocomplete(analyser);
-            }
-            WriteLine();
+                await Diagnostics(analyser);
 
-            WriteLine($"Compiling...");
+                WriteLine();
 
-            using (UseColor(ConsoleColor.Cyan))
-            {
-                await Runner.CompileAndRunScript(analyser);
+                (var line, var column) = PositionConverter.PositionToRowColumn(playground.EditingFile.EditorPosition.Value, playground.EditingFile.RawContents);
+
+                WriteLine($"Intellisense at {playground.EditingFile.EditorPosition} (line {line}, column {column}): ");
+
+                using (UseColor(ConsoleColor.Cyan))
+                {
+                    await Autocomplete(analyser);
+                }
+                WriteLine();
+
+                WriteLine($"Compiling...");
+
+                using (UseColor(ConsoleColor.Cyan))
+                {
+                    await analyser.CompileAndRunScript();
+                }
             }
+
             WriteLine();
 
             WriteLine($"Press {nameof(ConsoleKey.Enter)} to exit");
@@ -103,7 +103,7 @@ namespace RoslynPlayground
 
         private static async Task Autocomplete(Analyser analyser)
         {
-            IEnumerable<CompletionItem> autocomplete = await analyser.GetAutocompleteAsync();
+            IEnumerable<CompletionItem> autocomplete = await analyser.GetAutoCompleteAsync();
 
             var forDisplay = string.Join(Environment.NewLine,
                 autocomplete.Select(c => string.Join(", ", c.Tags) + " " + c.DisplayText));

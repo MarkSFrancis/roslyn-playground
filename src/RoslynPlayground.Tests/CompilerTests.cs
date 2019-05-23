@@ -18,9 +18,7 @@ namespace RoslynPlayground.Tests
         {
             var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Regular, SampleCode.CompilerTest);
 
-            var compiler = new CompilerService(playground);
-
-            CompilerResult result = await compiler.Compile();
+            CompilerResult result = await playground.CompileAsync();
 
             Assert.IsTrue(result.Success);
 
