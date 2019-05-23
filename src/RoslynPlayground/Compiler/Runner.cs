@@ -6,12 +6,22 @@ namespace RoslynPlayground.Compiler
 {
     public class Runner
     {
-        private static async Task CompileAndRun(Analyser analyser, string type, string methodName, object instance = null, params object[] parameters)
+        public static async Task CompileAndRun(Analyser analyser, string type, string methodName, object instance = null, params object[] parameters)
         {
-            await CompileAndRun<object>(analyser, type, methodName, instance, parameters);
+            await CompileAndRun<object>(analyser, type, methodName, BindingFlags.Default, instance, parameters);
         }
 
-        private static async Task<T> CompileAndRun<T>(Analyser analyser, string type, string methodName, object instance = null, params object[] parameters)
+        public static Task<T> CompileAndRun<T>(Analyser analyser, string type, string methodName, object instance = null, params object[] parameters)
+        {
+            return CompileAndRun<T>(analyser, type, methodName, BindingFlags.Default, instance, parameters);
+        }
+
+        public static async Task CompileAndRun(Analyser analyser, string type, string methodName, BindingFlags methodFlags, object instance = null, params object[] parameters)
+        {
+            await CompileAndRun<object>(analyser, type, methodName, methodFlags, instance, parameters);
+        }
+
+        public static async Task<T> CompileAndRun<T>(Analyser analyser, string type, string methodName, BindingFlags methodFlags, object instance = null, params object[] parameters)
         {
             CompilerResult compiled = await analyser.CompileAsync();
 
@@ -23,16 +33,18 @@ namespace RoslynPlayground.Compiler
             var loaded = Assembly.Load(compiled.Assembly);
             Type typeToExecute = loaded.GetType(type);
 
-            var result = typeToExecute.InvokeMember(methodName ?? "<Main>", BindingFlags.InvokeMethod, null, instance, parameters);
+            var result = typeToExecute.InvokeMember(methodName, BindingFlags.InvokeMethod | methodFlags, null, instance, parameters);
             return (T)result;
         }
 
-        public static async Task<T> CompileAndRunScript<T>()
+        public static Task CompileAndRunScript(Analyser analyser)
         {
+            return CompileAndRun(analyser, "Script", "<Main>", BindingFlags.NonPublic | BindingFlags.Static);
+        }
 
-
-            MethodInfo[] allMethods = typeToExecute.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
-            MethodInfo[] allMethods2 = typeToExecute.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic);
+        public static Task<T> CompileAndRunScript<T>(Analyser analyser)
+        {
+            return CompileAndRun<T>(analyser, "Script", "<Main>", BindingFlags.NonPublic | BindingFlags.Static);
         }
     }
 }

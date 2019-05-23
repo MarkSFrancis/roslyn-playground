@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.Completion;
 using RoslynPlayground.Analysis;
 using RoslynPlayground.Code;
+using RoslynPlayground.Compiler;
 using RoslynPlayground.ConsoleHelpers;
 using RoslynPlayground.Samples;
 using RoslynPlayground.Workspace;
@@ -28,8 +29,7 @@ namespace RoslynPlayground
             var playground = PlaygroundWorkspace.FromSource(
                 SourceCodeKind.Script,
                 SampleScript.HelloWorld,
-                8,
-                injectDefaultUsings: true
+                8
             );
 
             var analyser = new Analyser(playground);
@@ -52,7 +52,7 @@ namespace RoslynPlayground
 
             using (UseColor(ConsoleColor.Cyan))
             {
-                await CompileAndRun(analyser, null, null);
+                await Runner.CompileAndRunScript(analyser);
             }
             WriteLine();
 

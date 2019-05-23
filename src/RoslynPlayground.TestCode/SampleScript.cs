@@ -2,6 +2,9 @@
 {
     public static class SampleScript
     {
-        public static string HelloWorld => @"Console.WriteLine(""Hello World!"")";
+        public static string HelloWorld => @"
+using System;
+Console.WriteLine(""Hello World!"");
+";
     }
 }

@@ -108,17 +108,8 @@ namespace RoslynPlayground.Workspace
             SourceCodeKind workspaceType,
             string source,
             int? editorPosition = null,
-            string filename = "Program.cs",
-            bool injectDefaultUsings = false)
+            string filename = "Program.cs")
         {
-            if (injectDefaultUsings)
-            {
-                var usings = CodeImports.DefaultUsings()
-                    .Select(u => "using " + u + ";" + UnixStringExtensions.UnixNewLine);
-
-                source = string.Join(string.Empty, usings) + source;
-            }
-
             return new PlaygroundWorkspace(workspaceType, new SourceFile(filename, source, editorPosition));
         }
 
