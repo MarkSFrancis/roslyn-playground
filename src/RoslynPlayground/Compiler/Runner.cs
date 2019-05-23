@@ -23,6 +23,19 @@ namespace RoslynPlayground.Compiler
 
         public static async Task<T> CompileAndRun<T>(this Analyser analyser, string type, string methodName, BindingFlags methodFlags, object instance = null, params object[] parameters)
         {
+            if (analyser is null)
+            {
+                throw new ArgumentNullException(nameof(analyser));
+            }
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+            if (methodName is null)
+            {
+                throw new ArgumentNullException(nameof(methodName));
+            }
+
             CompilerResult compiled = await analyser.CompileAsync();
 
             if (!compiled.Success)

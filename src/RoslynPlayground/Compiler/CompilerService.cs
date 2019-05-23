@@ -11,6 +11,11 @@ namespace RoslynPlayground.Compiler
     {
         public static async Task<CompilerResult> CompileAsync(this PlaygroundWorkspace workspace)
         {
+            if (workspace is null)
+            {
+                throw new ArgumentNullException(nameof(workspace));
+            }
+
             Compilation compilation = await workspace.ActiveProject.GetCompilationAsync();
 
             var outputCodeStream = new MemoryStream();
