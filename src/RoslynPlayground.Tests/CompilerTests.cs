@@ -29,7 +29,6 @@ namespace RoslynPlayground.Tests
                 Assembly assembly = AppDomain.CurrentDomain.Load(result.Assembly);
 
                 Type[] sourceTypes = assembly.GetTypes();
-                Console.WriteLine(string.Join(", ", sourceTypes.Select(s => s.FullName)));
 
                 Type sourceType = sourceTypes.Single();
                 MethodInfo main = sourceType.GetMethod("Sample");
@@ -37,6 +36,29 @@ namespace RoslynPlayground.Tests
 
                 Assert.IsAssignableFrom<string>(invokeResult);
                 Assert.AreEqual("asdf1, asdf, From Source", invokeResult);
+            }
+        }
+
+        [Test]
+        public async Task CompilingScript_ThatDoesCompile_CompilesLoadableCode()
+        {
+            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Script, SampleScript.HelloWorld);
+
+            CompilerResult result = await playground.CompileAsync();
+
+            Assert.IsTrue(result.Success);
+
+            CollectionAssert.IsEmpty(result.Diagnostics);
+
+            if (result.Success)
+            {
+                Assembly assembly = AppDomain.CurrentDomain.Load(result.Assembly);
+
+                var scriptType = assembly.GetType(Runner.ScriptTypeName);
+                MethodInfo main = scriptType.GetMethod(Runner.ScriptEntryPointName, Runner.ScriptEntryPointFlags);
+                var invokeResult = main.Invoke(null, new object[0]);
+
+                Assert.AreEqual(null, invokeResult);
             }
         }
     }

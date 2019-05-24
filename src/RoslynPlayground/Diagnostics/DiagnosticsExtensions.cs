@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RoslynPlayground.Diagnostics
 {
-    public static class DiagnosticService
+    public static class DiagnosticsExtensions
     {
         public static async Task<IReadOnlyCollection<Diagnostic>> GetDiagnosticsAsync(this PlaygroundWorkspace workspace)
         {

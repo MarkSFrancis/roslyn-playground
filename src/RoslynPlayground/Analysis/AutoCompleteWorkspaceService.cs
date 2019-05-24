@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace RoslynPlayground.Analysis
 {
-    public class AutoCompleteService : IDisposable
+    public class AutoCompleteWorkspaceService : IDisposable
     {
-        public AutoCompleteService(PlaygroundWorkspace workspace)
+        public AutoCompleteWorkspaceService(PlaygroundWorkspace workspace)
         {
             Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
 
             Workspace.EditingDocumentChanged += WorkspaceEditingDocumentChanged;
 
             WorkspaceEditingDocumentChanged(
-                null, 
+                null,
                 new EditingDocumentChangedEventArgs(Workspace.EditingFile, Workspace.EditingDocument)
             );
         }

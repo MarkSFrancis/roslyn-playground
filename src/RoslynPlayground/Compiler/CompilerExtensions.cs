@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RoslynPlayground.Compiler
 {
-    public static class AnalyserCompilerExtensions
+    public static class CompilerExtensions
     {
         public static async Task<CompilerResult> CompileAsync(this PlaygroundWorkspace workspace)
         {
@@ -17,6 +17,16 @@ namespace RoslynPlayground.Compiler
             }
 
             Compilation compilation = await workspace.ActiveProject.GetCompilationAsync();
+
+            return compilation.ToCompilerResult();
+        }
+
+        public static CompilerResult ToCompilerResult(this Compilation compilation)
+        {
+            if (compilation is null)
+            {
+                throw new ArgumentNullException(nameof(compilation));
+            }
 
             var outputCodeStream = new MemoryStream();
             EmitResult result = compilation.Emit(outputCodeStream);

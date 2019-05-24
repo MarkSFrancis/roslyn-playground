@@ -24,11 +24,7 @@ namespace RoslynPlayground
             WriteLine(SampleScript.HelloWorld);
             WriteLine();
 
-            var playground = PlaygroundWorkspace.FromSource(
-                SourceCodeKind.Script,
-                SampleScript.HelloWorld,
-                8
-            );
+            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Script, SampleScript.HelloWorld, 25);
 
             using (var analyser = new Analyser(playground))
             {
@@ -60,7 +56,7 @@ namespace RoslynPlayground
             UntilEnterPressed();
         }
 
-        private static async Task Diagnostics(Analyser analyser)
+        private static async Task Diagnostics(IAnalyser analyser)
         {
             IReadOnlyCollection<Diagnostic> diagnosticsResult = await analyser.GetDiagnosticsAsync();
 
@@ -80,9 +76,6 @@ namespace RoslynPlayground
                 ConsoleColor colorOfDiagnostic;
                 switch (diagnostic.Severity)
                 {
-                    case DiagnosticSeverity.Hidden:
-                        colorOfDiagnostic = ConsoleColor.White;
-                        break;
                     case DiagnosticSeverity.Info:
                         colorOfDiagnostic = ConsoleColor.Cyan;
                         break;
@@ -92,6 +85,7 @@ namespace RoslynPlayground
                     case DiagnosticSeverity.Error:
                         colorOfDiagnostic = ConsoleColor.Red;
                         break;
+                    case DiagnosticSeverity.Hidden:
                     default:
                         colorOfDiagnostic = ConsoleColor.White;
                         break;
@@ -101,7 +95,7 @@ namespace RoslynPlayground
             }
         }
 
-        private static async Task Autocomplete(Analyser analyser)
+        private static async Task Autocomplete(IAnalyser analyser)
         {
             IEnumerable<CompletionItem> autocomplete = await analyser.GetAutoCompleteAsync();
 
