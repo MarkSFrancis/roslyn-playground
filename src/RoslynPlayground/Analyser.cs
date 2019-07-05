@@ -3,7 +3,9 @@ using Microsoft.CodeAnalysis.Completion;
 using RoslynPlayground.Analysis;
 using RoslynPlayground.Compiler;
 using RoslynPlayground.Diagnostics;
+using RoslynPlayground.Tokens;
 using RoslynPlayground.Workspace;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -25,6 +27,11 @@ namespace RoslynPlayground
         public Task<CompilerResult> CompileAsync()
         {
             return Workspace.CompileAsync();
+        }
+
+        public Task<IEnumerable<Token>> GetTokensAsync()
+        {
+            return Workspace.GetTokensAsync();
         }
 
         public Task<IEnumerable<CompletionItem>> GetAutoCompleteAsync()

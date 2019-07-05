@@ -24,10 +24,14 @@ namespace RoslynPlayground
             WriteLine(SampleScript.HelloWorld);
             WriteLine();
 
-            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Script, SampleScript.HelloWorld, 25);
+            var playground = PlaygroundWorkspace.FromSource(SourceCodeKind.Script, SampleScript.HelloWorld, 26);
 
             using (var analyser = new Analyser(playground))
             {
+                await Tokenize(analyser);
+
+                WriteLine();
+
                 await Diagnostics(analyser);
 
                 WriteLine();
@@ -54,6 +58,28 @@ namespace RoslynPlayground
 
             WriteLine($"Press {nameof(ConsoleKey.Enter)} to exit");
             UntilEnterPressed();
+        }
+
+        private static async Task Tokenize(IAnalyser analyser)
+        {
+            var tokens = await analyser.GetTokensAsync();
+
+            WriteLine("Tokenized source: ");
+            foreach (var token in tokens.OrderBy(t => t.Start))
+            {
+                if (token.Type == Tokens.TokenType.Keyword)
+                {
+                    WriteInColor(token.Text, ConsoleColor.Blue);
+                }
+                else if (token.Type == Tokens.TokenType.Literal)
+                {
+                    WriteInColor(token.Text, ConsoleColor.Red);
+                }
+                else
+                {
+                    Write(token.Text);
+                }
+            }
         }
 
         private static async Task Diagnostics(IAnalyser analyser)

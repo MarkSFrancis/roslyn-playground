@@ -16,7 +16,7 @@ namespace RoslynPlayground.Workspace
             files ??= Array.Empty<SourceFile>();
 
             var myFiles = new List<SourceFile>(files.Count);
-            foreach (var file in files)
+            foreach (SourceFile file in files)
             {
                 if (file.EditorPosition.HasValue)
                 {
@@ -79,7 +79,7 @@ namespace RoslynPlayground.Workspace
 
             Document editingDocument = null;
 
-            foreach (var fileToLoad in Files)
+            foreach (SourceFile fileToLoad in Files)
             {
                 fileToLoad.EditorPositionChanged += FileToLoadEditorPositionChanged;
 
@@ -90,7 +90,7 @@ namespace RoslynPlayground.Workspace
                     sourceCodeKind: WorkspaceType
                 );
 
-                var document = newWorkspace.AddDocument(documentToLoad);
+                Document document = newWorkspace.AddDocument(documentToLoad);
 
                 if (fileToLoad.EditorPosition.HasValue)
                 {
@@ -98,7 +98,7 @@ namespace RoslynPlayground.Workspace
                 }
             }
 
-            var project = newWorkspace.CurrentSolution.GetProject(projectInfo.Id);
+            Project project = newWorkspace.CurrentSolution.GetProject(projectInfo.Id);
 
             return (project, editingDocument);
         }
