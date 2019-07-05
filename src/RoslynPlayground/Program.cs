@@ -4,6 +4,7 @@ using RoslynPlayground.Code;
 using RoslynPlayground.Compiler;
 using RoslynPlayground.ConsoleHelpers;
 using RoslynPlayground.Samples;
+using RoslynPlayground.Tokens;
 using RoslynPlayground.Workspace;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace RoslynPlayground
     {
         private static async Task Main()
         {
-            WriteLine("Creating sandbox from source:");
+            WriteLine("Creating sandbox from C# script:");
             WriteLine();
             WriteLine(SampleScript.HelloWorld);
             WriteLine();
@@ -65,21 +66,14 @@ namespace RoslynPlayground
             var tokens = await analyser.GetTokensAsync();
 
             WriteLine("Tokenized source: ");
+
+            int lineId = 0;
             foreach (var token in tokens.OrderBy(t => t.Start))
             {
-                if (token.Type == Tokens.TokenType.Keyword)
-                {
-                    WriteInColor(token.Text, ConsoleColor.Blue);
-                }
-                else if (token.Type == Tokens.TokenType.Literal)
-                {
-                    WriteInColor(token.Text, ConsoleColor.Red);
-                }
-                else
-                {
-                    Write(token.Text);
-                }
+                WriteCodeBlock(token.Text, token.Type, ref lineId);
             }
+
+            WriteLine();
         }
 
         private static async Task Diagnostics(IAnalyser analyser)
@@ -131,6 +125,58 @@ namespace RoslynPlayground
             if (forDisplay != string.Empty)
             {
                 WriteLine(forDisplay);
+            }
+        }
+
+        private static void WriteCodeBlock(string codeBlock, TokenType type, ref int currentLine)
+        {
+            if (currentLine == 0)
+            {
+                WriteLineMarker(ref currentLine);
+            }
+
+            var formattedLines = codeBlock.Split(Environment.NewLine);
+
+            void WriteLineMarker(ref int currentLine)
+            {
+                WriteInColor(++currentLine + " |", ConsoleColor.DarkGray);
+            }
+
+            void WriteNode(string node)
+            {
+                if (type == TokenType.Keyword)
+                {
+                    WriteInColor(node, ConsoleColor.Blue);
+                }
+                else if (type == TokenType.Literal)
+                {
+                    WriteInColor(node, ConsoleColor.Red);
+                }
+                else
+                {
+                    Write(node);
+                }
+            }
+
+            if (formattedLines.Length > 1)
+            {
+                // Is multi-line block
+                WriteNode(formattedLines[0] + Environment.NewLine);
+
+                for (int index = 1; index < formattedLines.Length - 1; index++)
+                {
+                    WriteLineMarker(ref currentLine);
+
+                    WriteNode(formattedLines[index] + Environment.NewLine);
+                }
+
+                WriteLineMarker(ref currentLine);
+
+                WriteNode(formattedLines[^1]);
+            }
+            else
+            {
+                WriteNode(codeBlock);
             }
         }
     }
