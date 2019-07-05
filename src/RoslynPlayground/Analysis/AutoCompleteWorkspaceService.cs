@@ -42,22 +42,29 @@ namespace RoslynPlayground.Analysis
 
             CompletionList completionList = await _completionService.GetCompletionsAsync(Workspace.EditingDocument, Workspace.EditingFile.EditorPosition.Value);
 
-            return FilterByActiveSpan(completionList, Workspace.EditingFile.RawContents);
+            return FilterByActiveSpan(completionList, Workspace.EditingFile.RawContents, Workspace.EditingFile.EditorPosition);
         }
 
-        private IEnumerable<CompletionItem> FilterByActiveSpan(CompletionList suggested, string originalSource)
+        private IEnumerable<CompletionItem> FilterByActiveSpan(CompletionList suggested, string originalSource, int? editorPosition)
         {
             if (suggested is null)
             {
                 return new List<CompletionItem>();
             }
 
-            if (originalSource is null || suggested.Span.IsEmpty)
+            if (originalSource is null || suggested.Span.IsEmpty || !editorPosition.HasValue)
             {
                 return suggested.Items;
             }
 
-            var editingPrefix = originalSource.Substring(suggested.Span.Start, suggested.Span.Length);
+            var editingSpanLength = editorPosition.Value - suggested.Span.Start;
+
+            if (editingSpanLength <= 0)
+            {
+                return suggested.Items;
+            }
+
+            var editingPrefix = originalSource.Substring(suggested.Span.Start, editingSpanLength);
 
             return suggested.Items.Where(c => c.DisplayText.StartsWith(editingPrefix));
         }
