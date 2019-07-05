@@ -79,9 +79,13 @@ namespace RoslynPlayground.Tokens
             {
                 return TokenType.Keyword;
             }
-            else if (KindCategoryIs(kind, "literaltoken"))
+            else if (KindCategoryIs(kind, "LiteralToken"))
             {
                 return TokenType.Literal;
+            }
+            else if (KindCategoryIs(kind, "IdentifierToken"))
+            {
+                return TokenType.Identifier;
             }
             else
             {

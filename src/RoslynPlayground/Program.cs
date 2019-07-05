@@ -47,12 +47,17 @@ namespace RoslynPlayground
                 }
                 WriteLine();
 
-                WriteLine($"Compiling...");
+                WriteLine($"Compiling and executing...");
+                WriteLine(new string('-', 50));
+                WriteLine();
 
                 using (UseColor(ConsoleColor.Cyan))
                 {
                     await analyser.CompileAndRunScript();
                 }
+
+                WriteLine();
+                WriteLine(new string('-', 50));
             }
 
             WriteLine();
@@ -151,6 +156,10 @@ namespace RoslynPlayground
                 else if (type == TokenType.Literal)
                 {
                     WriteInColor(node, ConsoleColor.Red);
+                }
+                else if (type == TokenType.Identifier)
+                {
+                    WriteInColor(node, ConsoleColor.Cyan);
                 }
                 else
                 {
